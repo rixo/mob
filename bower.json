@@ -1,0 +1,35 @@
+{
+  "name": "onmangequoi",
+  "authors": [
+    "rixo@protonmail.ch"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Framework7": "framework7#^1.4.0",
+    "lodash": "^4.5.1"
+  },
+  "overrides": {
+    "Framework7": {
+      "main": [
+        "dist/css/framework7.material.css",
+        "dist/css/framework7.material.colors.css",
+        "dist/js/framework7.js"
+      ]
+    },
+    "lodash": {
+      "main": "lodash.js"
+    }
+  }
+}
