@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var SubTask = require('gulp-subtask')(gulp);
 var gutil = require('gulp-util');
 var $ = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
@@ -22,8 +23,12 @@ var ctx = require('./ctx');
 
 gulp.task('watch', function(done) {
   runSequence(
-    'context:watch',
-    'build',
+    'context:watch', [
+      'watch-deleted',
+      'watch:bower.json',
+      'watch:index',
+      'build'
+    ],
     done
   );
 });
@@ -32,7 +37,6 @@ gulp.task('build', function(done) {
   runSequence(
     'clean', [
       'scripts',
-      'watch-deleted',
       'html',
       'index'
     ],
@@ -71,45 +75,48 @@ gulp.task('scripts', function() {
   ;
 });
 
-gulp.task('index', ['watch-bower-json'], function() {
-  return gulp.src(indexSrc)
-    .pipe($.if(ctx.watch, $.watch(indexSrc, {
-      events: ['add', 'change'],
-      name: 'html',
-      verbose: true
-    })))
-    .pipe(wiredep(_.extend({}, conf.wiredep)))
-    .pipe($.useref({}, lazypipe().pipe($.sourcemaps.init, { loadMaps: true })))
-    .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(path.join(conf.paths.www)))
-    .pipe(browserSync.stream())
-  ;
-});
+(function() {
+  var indexTask = new SubTask()
+    .pipe(wiredep, _.extend({}, conf.wiredep))
+    .pipe($.useref, {}, lazypipe().pipe($.sourcemaps.init, { loadMaps: true }))
+    .pipe($.sourcemaps.write, '.')
+    .pipe(gulp.dest, path.join(conf.paths.www))
+    .pipe($.debug)
+    .pipe(browserSync.stream);
 
-gulp.task('watch-bower-json', function() {
-  if (ctx.watch) {
-    $.watch([
-      'bower.json'
-    ], function() {
-      gulp.start('index');
-    });
-  }
+  gulp.task('index', function() {
+    return gulp.src(indexSrc).pipe(indexTask.run());
+  });
+
+  gulp.task('watch:index', function() {
+    return $.watch(indexSrc, {
+      events: ['add', 'change'],
+      name: 'index',
+      verbose: true
+    }).pipe(indexTask.run());
+  });
+}());
+
+gulp.task('watch:bower.json', function() {
+  return $.watch([
+    'bower.json'
+  ], function() {
+    gulp.start('index');
+  });
 });
 
 gulp.task('watch-deleted', function() {
-  if (ctx.watch) {
-    var watchOptions = {
-      events: ['unlink'],
-      name: 'watch-deleted',
-      read: false
-    };
-    return $.watch(watchDeletedSrc, watchOptions, function(file) {
-        del(path.join(file.cwd, conf.paths.www, file.relative));
-      })
-      .pipe($.debug())
-      .pipe(browserSync.stream())
-      ;
-  }
+  var watchOptions = {
+    events: ['unlink'],
+    name: 'watch-deleted',
+    read: false
+  };
+  return $.watch(watchDeletedSrc, watchOptions, function(file) {
+      del(path.join(file.cwd, conf.paths.www, file.relative));
+    })
+    .pipe($.debug())
+    .pipe(browserSync.stream())
+    ;
 });
 
 gulp.task('html', function() {
