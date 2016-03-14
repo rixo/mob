@@ -18,7 +18,8 @@
   ],
   "dependencies": {
     "Framework7": "framework7#^1.4.0",
-    "lodash": "^4.5.1"
+    "lodash": "^4.5.1",
+    "angular": "^1.5.0"
   },
   "overrides": {
     "Framework7": {

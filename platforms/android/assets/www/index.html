@@ -29,8 +29,12 @@
       * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
           * Enable inline JS: add 'unsafe-inline' to default-src
   -->
+  <!-- original policy
   <meta http-equiv="Content-Security-Policy"
-      content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+      content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *;">
+  -->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-8U0IjmKhdF6muyTAHYlt46GTDHbWDTClf0ZpO3SBmxs='">
+
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <!--<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">-->
@@ -46,34 +50,68 @@
   <!--<link rel="stylesheet" href="path/to/framework7.material.min.css">-->
   <!--<link rel="stylesheet" href="path/to/framework7.material.colors.min.css">-->
 
-  <!-- build:css({.tmp/serve,src}) vendor.css -->
-  <!-- bower:css -->
-  <link rel="stylesheet" href="../bower_components/Framework7/dist/css/framework7.material.min.css" />
-  <link rel="stylesheet" href="../bower_components/Framework7/dist/css/framework7.material.colors.min.css" />
-  <!-- endbower -->
-  <!-- endbuild -->
+  <link rel="stylesheet" href="vendor.css">
 
-  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <!--<link rel="stylesheet" type="text/css" href="css/index.css">-->
   <title>Hello World</title>
 </head>
 <body>
 
-<div class="app">
-  <h1>Apache Cordova</h1>
-  <div id="deviceready" class="blink">
-    <p class="event listening">Connecting to Device</p>
-    <p class="event received">Device is Ready</p>
-  </div>
+<!--<div class="app">-->
+  <!--<h1>Apache Cordova</h1>-->
+  <!--<div id="deviceready" class="blink">-->
+    <!--<p class="event listening">Connecting to Device</p>-->
+    <!--<p class="event received">Device is Ready</p>-->
+  <!--</div>-->
+<!--</div>-->
+<!-- Views -->
+<style>
+  f7-pages,
+  f7-page {
+    display: block;
+  }
+</style>
+
+<div class="views">
+  <!-- Your main view, should have "view-main" class -->
+  <f7-view class="view view-main">
+    <!-- Pages container, because we use fixed navbar and toolbar, it has additional appropriate classes-->
+    <f7-pages class="pages navbar-fixed toolbar-fixed">
+      <!-- Page, "data-page" contains page name -->
+      <f7-page data-page="index" class="page">
+
+        <!-- Top Navbar. In Material theme it should be inside of the page-->
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="center">Awesome App</div>
+          </div>
+        </div>
+
+        <!-- Bottom Toolbar. In Material theme it should be inside of the page-->
+        <div class="toolbar">
+          <div class="toolbar-inner">
+            <!-- Toolbar links -->
+            <a href="#" class="link">Link 1</a>
+            <a href="#" class="link">Link 2</a>
+          </div>
+        </div>
+
+        <!-- Scrollable page content -->
+        <div class="page-content">
+          <p>Page content goes here</p>
+          <!-- Link to another page -->
+          <a href="about.html">About app</a>
+        </div>
+      </f7-page>
+    </f7-pages>
+  </f7-view>
 </div>
 
 <script type="text/javascript" src="cordova.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
 
-<!-- build:js(src) scripts/vendor.js -->
-<!-- bower:js -->
-<script src="../bower_components/lodash/lodash.js"></script>
-<!-- endbower -->
-<!-- endbuild -->
+<script src="vendor.js"></script>
+
+<script type="text/javascript" src="js/index.js"></script>
 
 </body>
 </html>

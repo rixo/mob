@@ -23,11 +23,16 @@ var ctx = require('./ctx');
 
 gulp.task('watch', function(done) {
   runSequence(
-    'context:watch', [
-      'watch-deleted',
-      'watch:bower.json',
-      'watch:index',
-      'build'
+    [
+      'context:watch',
+      'clean'
+    ], [
+      'scripts',
+      'html',
+      'index'
+    ], [
+      'watch:inject',
+      'watch:scripts'
     ],
     done
   );
@@ -44,7 +49,10 @@ gulp.task('build', function(done) {
   );
 });
 
-var scriptsSrc = path.join(conf.paths.src, '**/*.js');
+var scriptsSrc = [
+  path.join(conf.paths.src, '**/*.js'),
+  '!' + path.join(conf.paths.src, '**/*.spec.js')
+];
 var indexSrc = path.join(conf.paths.src, '**/*.html');
 var htmlSrc = [
   path.join(conf.paths.src, '**/*.html'),
@@ -62,61 +70,91 @@ gulp.task('clean', function() {
   return del(conf.paths.www);
 });
 
-gulp.task('scripts', function() {
-  return gulp.src(scriptsSrc)
-    .pipe($.if(ctx.watch, $.watch(scriptsSrc, {
+(function() {
+  var task = new SubTask()
+    .pipe(gulp.dest, conf.paths.www)
+    .pipe(browserSync.stream);
+
+  gulp.task('scripts', function() {
+    return gulp.src(scriptsSrc).pipe(task.run());
+  });
+
+  gulp.task('watch:scripts', function() {
+    $.watch(scriptsSrc, {
       events: ['add', 'change'],
       name: 'scripts-changed',
       verbose: true
-    })))
-    //.pipe($.debug())
-    .pipe(gulp.dest(conf.paths.www))
-    .pipe(browserSync.stream())
-  ;
-});
-
-(function() {
-  var indexTask = new SubTask()
-    .pipe(wiredep, _.extend({}, conf.wiredep))
-    .pipe($.useref, {}, lazypipe().pipe($.sourcemaps.init, { loadMaps: true }))
-    .pipe($.sourcemaps.write, '.')
-    .pipe(gulp.dest, path.join(conf.paths.www))
-    .pipe($.debug)
-    .pipe(browserSync.stream);
-
-  gulp.task('index', function() {
-    return gulp.src(indexSrc).pipe(indexTask.run());
-  });
-
-  gulp.task('watch:index', function() {
-    return $.watch(indexSrc, {
-      events: ['add', 'change'],
-      name: 'index',
-      verbose: true
-    }).pipe(indexTask.run());
+    }).pipe(task.run());
   });
 }());
 
-gulp.task('watch:bower.json', function() {
-  return $.watch([
-    'bower.json'
-  ], function() {
-    gulp.start('index');
-  });
+//gulp.task('scripts', function() {
+//  return gulp.src(scriptsSrc)
+//    .pipe($.if(ctx.watch, $.watch(scriptsSrc, {
+//      events: ['add', 'change'],
+//      name: 'scripts-changed',
+//      verbose: true
+//    })))
+//    //.pipe($.debug())
+//    .pipe(gulp.dest(conf.paths.www))
+//    //.pipe(browserSync.stream())
+//  ;
+//});
+
+gulp.task('index', function() {
+  //var injectScripts = gulp.src([
+  //  path.join(conf.paths.src, '/**/*.module.js'),
+  //  path.join(conf.paths.src, '/**/*.js'),
+  //  '!' + path.join(conf.paths.www, '/vendor.js')
+  //], {
+  var injectScripts = gulp.src(scriptsSrc, {
+    read: false
+  }).pipe($.debug());
+
+  var injectOptions = {
+    ignorePath: [conf.paths.src],
+    addRootSlash: false
+  };
+
+  return gulp.src(indexSrc)
+    .pipe($.inject(injectScripts, injectOptions))
+    .pipe(wiredep(_.extend({}, conf.wiredep)))
+    .pipe($.useref({}, lazypipe().pipe($.sourcemaps.init, { loadMaps: true })))
+    .pipe($.sourcemaps.write('.'))
+    .pipe(gulp.dest(path.join(conf.paths.www)))
+    //.pipe($.debug())
+    .pipe(browserSync.stream());
 });
 
-gulp.task('watch-deleted', function() {
-  var watchOptions = {
+gulp.task('watch:inject', function() {
+  $.watch([
+    'bower.json',
+    indexSrc
+  ], {
+    name: 'watch:vendor-change'
+  }, function(file) {
+    gulp.start('index');
+  });
+  // inject scripts
+  $.watch(path.join(conf.paths.src, '**/*.js'), {
+    name: 'watch:src/**/*.js',
+    read: false,
+    verbose: true
+  }, function(file) {
+    if (file.event === 'change') {
+      // content change only -- don't need to be handled here
+    } else {
+      gulp.start('index');
+    }
+  });
+  $.watch(watchDeletedSrc, {
     events: ['unlink'],
-    name: 'watch-deleted',
+    name: 'watch:deleted',
     read: false
-  };
-  return $.watch(watchDeletedSrc, watchOptions, function(file) {
-      del(path.join(file.cwd, conf.paths.www, file.relative));
-    })
-    .pipe($.debug())
-    .pipe(browserSync.stream())
-    ;
+  }, function(file) {
+    del(path.join(file.cwd, conf.paths.www, file.relative));
+    gulp.start('index');
+  });
 });
 
 gulp.task('html', function() {
