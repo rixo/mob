@@ -1,21 +1,23 @@
 {
-  "name": "onmangequoi",
+  "name": "mob",
   "version": "0.0.1",
-  "description": "",
+  "description": "Module Build: gulp tasks",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
+  "author": "rixo <rixo@protonmail.ch>",
+  "license": "MIT",
+  "peerDependencies": {
+    "gulp": "^3.9.1"
+  },
+  "dependencies": {
     "browser-sync": "^2.11.1",
     "colors": "^1.1.2",
     "cordova": "^6.0.0",
     "cordova-browsersync-primitives": "^1.1.1",
     "cordova-plugin-browsersync": "^0.1.5",
     "del": "^2.2.0",
-    "gulp": "^3.9.1",
     "gulp-debug": "^2.1.2",
     "gulp-if": "^2.0.0",
     "gulp-inject": "^3.0.0",
