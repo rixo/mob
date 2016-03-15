@@ -1,6 +1,6 @@
 'use strict';
 
-var gulp = require('gulp');
+var gulp = require('./gulp');
 
 var ctx = {
   watch: false

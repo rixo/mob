@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var path = require('path');
 
-var gulp = require('gulp');
+var gulp = require('./gulp');
 var gutil = require('gulp-util');
 var $ = require('gulp-load-plugins')();
 
