@@ -17,7 +17,7 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<html>
+<html ng-app="kkm">
 <head>
   <!-- Cordova -->
   <!--
@@ -33,7 +33,8 @@
   <meta http-equiv="Content-Security-Policy"
       content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *;">
   -->
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-8U0IjmKhdF6muyTAHYlt46GTDHbWDTClf0ZpO3SBmxs='">
+  <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-8U0IjmKhdF6muyTAHYlt46GTDHbWDTClf0ZpO3SBmxs='">-->
+  <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-8U0IjmKhdF6muyTAHYlt46GTDHbWDTClf0ZpO3SBmxs='">-->
 
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
@@ -52,6 +53,9 @@
 
   <link rel="stylesheet" href="vendor.css">
 
+  <!-- inject:css -->
+  <!-- css files will be automatically insert here -->
+  <!-- endinject -->
   <!--<link rel="stylesheet" type="text/css" href="css/index.css">-->
   <title>Hello World</title>
 </head>
@@ -83,7 +87,8 @@
         <!-- Top Navbar. In Material theme it should be inside of the page-->
         <div class="navbar">
           <div class="navbar-inner">
-            <div class="center">Awesome App</div>
+            <div class="center">Get this party started!</div>
+            <div>Wait, what?!</div>
           </div>
         </div>
 
@@ -98,7 +103,21 @@
 
         <!-- Scrollable page content -->
         <div class="page-content">
-          <p>Page content goes here</p>
+          <pre>
+            [X] Run on device
+            [X] Run on desktop
+            - Gulp
+              [X] Watch and rebuild only what is necessary
+              [X] Inject scripts
+              [X] Build vendor
+              [ ] SASS
+            [X] Browser sync cordova
+              [ ] Browser sync navigation across devices (seems broken)
+            - index.html
+              [X] Fake cordova.js for desktop (TODO extend support to FF, etc)
+          </pre>
+          <p>On --desktop-- mobile too!, however, it is FAAAST!</p>
+          <p>WTF? WTF?</p>
           <!-- Link to another page -->
           <a href="about.html">About app</a>
         </div>
@@ -107,11 +126,20 @@
   </f7-view>
 </div>
 
-<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript">
+  if (!navigator.userAgent.toLowerCase().match('chrome')) {
+    document.write("<script src='cordova.js'><\/script>");
+  }
+</script>
 
 <script src="vendor.js"></script>
 
-<script type="text/javascript" src="js/index.js"></script>
+<!-- inject:js -->
+<script src="js/app.module.js"></script>
+<script src="js/index.js"></script>
+<!-- endinject -->
+
+<!--<script type="text/javascript" src="js/index.js"></script>-->
 
 </body>
 </html>

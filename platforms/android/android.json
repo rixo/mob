@@ -14,11 +14,24 @@
                         }
                     ]
                 }
+            },
+            "config.xml": {
+                "parents": {
+                    "/*": []
+                }
+            },
+            "AndroidManifest.xml": {
+                "parents": {
+                    "/manifest": []
+                }
             }
         }
     },
     "installed_plugins": {
         "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-plugin-browsersync": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     },
