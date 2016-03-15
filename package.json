@@ -11,6 +11,9 @@
   "devDependencies": {
     "browser-sync": "^2.11.1",
     "colors": "^1.1.2",
+    "cordova": "^6.0.0",
+    "cordova-browsersync-primitives": "^1.1.1",
+    "cordova-plugin-browsersync": "^0.1.5",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-debug": "^2.1.2",
