@@ -11,7 +11,7 @@ var cordova = require('cordova-lib').cordova;
 var cordovaBrowserSync = require('cordova-browsersync-primitives');
 var Patcher = require('cordova-plugin-browsersync/lib/utils/Patcher');
 
-gulp.task('serve', function() {
+gulp.task('serve', ['watch'], function() {
 
   var projectRoot = path.normalize(__dirname + '/..');
   var platforms = ['android', 'ios'];

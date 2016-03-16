@@ -4,7 +4,7 @@ var gulp = require('./gulp');
 var SubTask = require('gulp-subtask')(gulp);
 var gutil = require('gulp-util');
 var $ = require('gulp-load-plugins')();
-var runSequence = require('run-sequence');
+var runSequence = require('run-sequence').use(gulp);
 var path = require('path');
 var del = require('del');
 var wiredep = require('wiredep').stream;
@@ -13,13 +13,13 @@ var lazypipe = require('lazypipe');
 
 //var browserSync = require('browser-sync');
 var browserSync = {
-  stream: function() {
-    return gutil.noop();
-  }
+  stream: gutil.noop
 };
 
 var conf = require('./conf');
 var ctx = require('./ctx');
+
+var scripts = Scripts();
 
 gulp.task('watch', function(done) {
   runSequence(
@@ -27,12 +27,12 @@ gulp.task('watch', function(done) {
       'context:watch',
       'clean'
     ], [
-      'scripts',
+      scripts.run.name,
       'html',
       'index'
     ], [
       'watch:inject',
-      'watch:scripts'
+      scripts.watch.name
     ],
     done
   );
@@ -49,10 +49,6 @@ gulp.task('build', function(done) {
   );
 });
 
-var scriptsSrc = [
-  path.join(conf.paths.src, '**/*.js'),
-  '!' + path.join(conf.paths.src, '**/*.spec.js')
-];
 var indexSrc = path.join(conf.paths.src, '**/*.html');
 var htmlSrc = [
   path.join(conf.paths.src, '**/*.html'),
@@ -63,30 +59,44 @@ var htmlSrc = [
 var watchDeletedSrc = []
   .concat(indexSrc)
   .concat(htmlSrc)
-  .concat(scriptsSrc)
+  .concat(scripts.src)
 ;
 
 gulp.task('clean', function() {
   return del(conf.paths.www);
 });
 
-(function() {
+function Scripts() {
+  var src = [
+    path.join(conf.paths.src, '**/*.js'),
+    '!' + path.join(conf.paths.src, '**/*.spec.js')
+  ];
   var task = new SubTask()
     .pipe(gulp.dest, conf.paths.www)
     .pipe(browserSync.stream);
 
-  gulp.task('scripts', function() {
-    return gulp.src(scriptsSrc).pipe(task.run());
-  });
+  return {
+    src: src,
+    run: _.extend(gulp.task('scripts', scripts), {
+      name: 'scripts'
+    }),
+    watch: _.extend(gulp.task('watch:scripts', watchScripts), {
+      name: 'watch:scripts'
+    })
+  };
 
-  gulp.task('watch:scripts', function() {
-    $.watch(scriptsSrc, {
+  function scripts() {
+    return gulp.src(src).pipe(task.run());
+  }
+
+  function watchScripts() {
+    $.watch(src, {
       events: ['add', 'change'],
       name: 'scripts-changed',
       verbose: true
     }).pipe(task.run());
-  });
-}());
+  }
+}
 
 //gulp.task('scripts', function() {
 //  return gulp.src(scriptsSrc)
@@ -107,7 +117,7 @@ gulp.task('index', function() {
   //  path.join(conf.paths.src, '/**/*.js'),
   //  '!' + path.join(conf.paths.www, '/vendor.js')
   //], {
-  var injectScripts = gulp.src(scriptsSrc, {
+  var injectScripts = gulp.src(scripts.src, {
     read: false
   }).pipe($.debug());
 
