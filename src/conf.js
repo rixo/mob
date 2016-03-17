@@ -5,8 +5,10 @@
  */
 exports.paths = {
   src: 'src',
-  dist: 'www',
-  www: 'www',
+  out: '{www}/src', // src (scripts, styles, assets) dest
+  dist: 'www', // clean rimraf
+  www: '{dist}', // serve root
+  lib: '{www}/bower_components',
   tmp: '.tmp',
   e2e: 'e2e'
 };

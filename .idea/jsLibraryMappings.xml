@@ -2,6 +2,6 @@
 <project version="4">
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$" libraries="{onmangequoi node_modules}" />
-    <file url="PROJECT" libraries="{gulp-DefinitelyTyped, lazypipe-DefinitelyTyped, wiredep-DefinitelyTyped, wrench-DefinitelyTyped}" />
+    <file url="PROJECT" libraries="{fs-extra-promise-DefinitelyTyped, gulp-DefinitelyTyped, lazypipe-DefinitelyTyped, wiredep-DefinitelyTyped, wrench-DefinitelyTyped}" />
   </component>
 </project>

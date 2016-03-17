@@ -21,18 +21,35 @@ var ctx = require('./ctx');
 
 var scripts = Scripts();
 
+module.exports = function() {
+  return function buildTask(done) {
+    runSequence(
+      'clean', [
+        'scripts',
+        'html',
+        'index'
+      ],
+      'cordova:prepare',
+      done
+    );
+  };
+};
+
 gulp.task('watch', function(done) {
   runSequence(
     [
       'context:watch',
       'clean'
     ], [
-      scripts.run.name,
+      'scripts',
+      'styles',
       'html',
       'index'
     ], [
+      'cordova:prepare',
       'watch:inject',
-      scripts.watch.name
+      'watch:scripts',
+      'watch:styles'
     ],
     done
   );
@@ -45,6 +62,7 @@ gulp.task('build', function(done) {
       'html',
       'index'
     ],
+    'cordova:prepare',
     done
   );
 });
@@ -73,20 +91,23 @@ function Scripts() {
   ];
   var task = new SubTask()
     .pipe(gulp.dest, conf.paths.www)
-    .pipe(browserSync.stream);
+    //.pipe(browserSync.stream);
+
+  gulp.task('scripts', scripts);
+  gulp.task('watch:scripts', watchScripts);
 
   return {
     src: src,
-    run: _.extend(gulp.task('scripts', scripts), {
-      name: 'scripts'
-    }),
-    watch: _.extend(gulp.task('watch:scripts', watchScripts), {
-      name: 'watch:scripts'
-    })
+  //  run: _.extend(),
+  //  watch: _.extend(gulp.task('watch:scripts', watchScripts), {
+  //    name: 'watch:scripts'
+  //  })
   };
 
   function scripts() {
-    return gulp.src(src).pipe(task.run());
+    return gulp.src(src)
+      .pipe(gulp.dest(conf.paths.www))
+      //.pipe(task.run());
   }
 
   function watchScripts() {
@@ -129,7 +150,7 @@ gulp.task('index', function() {
   return gulp.src(indexSrc)
     .pipe($.inject(injectScripts, injectOptions))
     .pipe(wiredep(_.extend({}, conf.wiredep)))
-    .pipe($.useref({}, lazypipe().pipe($.sourcemaps.init, { loadMaps: true })))
+    //.pipe($.useref({}, lazypipe().pipe($.sourcemaps.init, { loadMaps: true })))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest(path.join(conf.paths.www)))
     //.pipe($.debug())
@@ -176,6 +197,5 @@ gulp.task('html', function() {
     //})))
     .pipe($.debug())
     .pipe(gulp.dest(conf.paths.www))
-    .pipe(browserSync.stream())
-  ;
+    .pipe(browserSync.stream());
 });
